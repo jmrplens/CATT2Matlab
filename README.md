@@ -17,6 +17,15 @@ At the moment, English and Spanish, but in the `language.m` file you can easily 
 3. Clic on the `Import From...>CATT-Acoustic`, and select the folder with data (you can use the example folder).
 4. Play with buttons.
 
+**Important**: I recommend activating the hidden function to get text files with ISM (image source model) for get all functions of this app.
+
+**How to activate the hidden option?**
+
+1. Find the file hiddenoptions.txt, it is in the folder of installation of CATT-Acoustic, usually in: `C:\Program Files\CATT\`
+2. Edit the `hiddenoptions.txt` file (if it is called hiddenoptions_removethis.txt, delete '_removethis'). You have to remove the comment `;` from the line where the activation code for ISM is.
+
+## Export functions
+You can export the data to Excel, and also export figure in multiple image formats.
 
 ### Animations (Exported with CATT2Matlab app)
 <img src="http://jmrplens.com/GitHub_CATT2Matlab/VideoSPLDIST.gif" width="50%"></img><img src="http://jmrplens.com/GitHub_CATT2Matlab/VideoMAPSPL.gif" width="50%"></img>
