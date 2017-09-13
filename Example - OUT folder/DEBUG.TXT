@@ -1,0 +1,12 @@
+CATT-Acoustic v8.0b debug :  Aula Optica 
+----------------------------------------------------------------------
+DUPLICATE PLANE  ID's    :  no !
+PLANES MODELLED TWICE    :  no !
+DUPLICATE CORNER ID's    :  no !
+DUPLICATE CORNERS        :  no !
+SINGLE-CONNECTED CORNERS :  no !
+INACCURATE PLANE CORNERS :  no !
+EDGES CUTTING/TOUCHING   :  no !
+POSSIBLY REVERSED PLANES :  no !
+----------------------------------------------------------------------
+
