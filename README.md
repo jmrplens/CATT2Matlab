@@ -28,7 +28,7 @@ At the moment, English and Spanish, but in the `language.m` file you can easily 
 You can export the data to Excel, and also export figure in multiple image formats.
 
 ### Animations (Exported with CATT2Matlab app)
-<img src="http://jmrplens.com/GitHub_CATT2Matlab/VideoSPLDIST.gif" width="50%"></img><img src="http://jmrplens.com/GitHub_CATT2Matlab/VideoMAPSPL.gif" width="50%"></img>
+<img src="http://jmrplens.com/GitHub_CATT2Matlab/VideoSPLDIST2.gif" width="50%"></img><img src="http://jmrplens.com/GitHub_CATT2Matlab/VideoMAPSPL.gif" width="50%"></img>
 
 ### Screenshots
 <img src="http://jmrplens.com/GitHub_CATT2Matlab/Preview1.png" width="60%"></img>
