@@ -19,7 +19,7 @@ At the moment, English and Spanish, but in the `language.m` file you can easily 
 3. Clic on the `Import From...>CATT-Acoustic`, and select the folder with data (you can use the example folder).
 4. Play with buttons.
 
-**Important**: I recommend activating the hidden function to get text files with ISM (image source model) for get all functions of this app.
+**Important**: I recommend activate the hidden function to get text files with ISM (image source model) for get all functions of this app.
 
 **How to activate the hidden option?**
 
