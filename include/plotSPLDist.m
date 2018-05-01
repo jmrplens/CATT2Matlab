@@ -23,6 +23,8 @@ for d=1:size(RecPosition_00,1)
         (RecPosition_00(d,3)-SRCPosition(3))^2);
 end
 
+Distplot = min(Distancia):0.01:max(Distancia); % Vector de distancias para las curvas
+
 % Obtencion del SPL a cada receptor segun la posicion de fuente recibida
 Ini = find(strcmp(SPLxRec_00, IDFuente)==1,1);
 Fin = find(strcmp(SPLxRec_00, IDFuente)==1,1,'last');
@@ -48,12 +50,10 @@ for i=1:numel(SPLm)
             % Suma el bloque por octavas y vuelve a sumar para obtener un valor
             ValMS(j) = 10*log10(sum(sum(10.^(Valores/10),1)));
         else
-            ValMS(j)=0;
+            ValMS(j)=NaN; % Este valor se interpola más adelante
         end
         
     end
-    % Todos los valores 0 y menores a 0 se dejan vacios
-    ValMS(ValMS<=0) = NaN;
     % Si se utiliza matlab 2014b o anterior realiza la interpolacion
     % manualmente, sino utiliza la funcion fillmising
     if verLessThan('matlab','8.7')
@@ -90,30 +90,19 @@ val = accumarray(idx,Mix1(:,2),[],@mean);
 Mix1 = [C,val];
 % Añadir por extrapolacion valor en la posicion de 0 metros hasta la posicion del
 % receptor mas cercano
-V0_0toVal=interp1(Mix1(:,1),Mix1(:,2),0,'linear','extrap');
-Mix1 = [[0;V0_0toVal]';Mix1];
+%V0_0toVal=interp1(Mix1(:,1),Mix1(:,2),0,'linear','extrap');
+%Mix1 = [[0;V0_0toVal]';Mix1];
 % Separar los valores para graficar y convertirlo en vector fila
 Dist = Mix1(:,1);
 SPLrec = Mix1(:,2);
-% Posible alternativa para curva. Pero no se ajusta correctamente
-% myfit = fit(Dist,SPLrec,'power1'); % Se obtiene curva de forma a*x^b
-% myfit.a % devuelve el coeficiente a
-% myfit.b % devuelve el coeficiente b
-% y1 = feval(myfit, Dist); % se obtiene los valores de Y segun myfit y valores de X
-% Crear curva cubica
-p1=polyfit(Dist,SPLrec,3);
-y1 = polyval(p1,Dist);
-% Obtener el ajuste R^2
-yfit = polyval(p1,Dist);
-yresid = SPLrec - yfit;
-SSresid = sum(yresid.^2);
-SStotal = (length(SPLrec)-1) * var(SPLrec);
-rsq_adj1 = 1 - SSresid/SStotal * (length(SPLrec)-1)/(length(SPLrec)-length(p1));
+% Crear curva potencial
+[Ucoef,Ures,Uoutput]=fit(Dist,SPLrec,'power1');
+Uplot=Ucoef.a*Distplot.^Ucoef.b;
 % Muestra los puntos
 plot(Dist,SPLrec,'o')
 hold on
 % Muestra la curva
-Curv(1)=plot(Dist,y1,'b');
+Curv(1)=plot(Distplot,Uplot,'b');
 
 %% Puntos y curva de valor a infinito ms
 % Ordenar valores de distancia de menor a mayor manteniendo su valor de SPl
@@ -126,25 +115,19 @@ val = accumarray(idx,Mix2(:,2),[],@mean);
 Mix2 = [C,val];
 % Añadir por extrapolacion valor en la posicion de 0 metros hasta la posicion del
 % receptor mas cercano
-V0_0toVal=interp1(Mix2(:,1),Mix2(:,2),0,'linear','extrap');
-Mix2 = [[0;V0_0toVal]';Mix2];
+% V0_0toVal=interp1(Mix2(:,1),Mix2(:,2),0,'linear','extrap');
+% Mix2 = [[0;V0_0toVal]';Mix2];
 % Separar los valores para graficar y convertirlo en vector fila
 Dist = Mix2(:,1);
 SPLrec = Mix2(:,2);
-% Crear curva cubica
-p2=polyfit(Dist,SPLrec,3);
-% Se obtiene el valor de la pendiente
-y1 = polyval(p2,Dist);
+% Obtener coeificentes curva polinomica de grado 1
+[Pcoef,Pres,Poutput] = fit(Dist,SPLrec,'poly1');
+% Crea la curva
+Pplot = Pcoef.p1*Distplot+Pcoef.p2;
 % Muestra los puntos
 plot(Dist,SPLrec,'o')
-% Obtener el ajuste R^2
-yfit = polyval(p2,Dist);
-yresid = SPLrec - yfit;
-SSresid = sum(yresid.^2);
-SStotal = (length(SPLrec)-1) * var(SPLrec);
-rsq_adj2 = 1 - SSresid/SStotal * (length(SPLrec)-1)/(length(SPLrec)-length(p2));
 % Muestra la curva
-Curv(2)=plot(Dist,y1,'r');
+Curv(2)=plot(Distplot,Pplot,'r');
 
 hold off
 
@@ -152,28 +135,23 @@ hold off
 % Añade las rejillas de las graficas
 grid on
 grid minor
+
 % Obtener punto de cruce
-Vector = 0:0.01:max(Dist);
-f1a = p1(1)*Vector.^3 + p1(2)*Vector.^2 + p1(3)*Vector + p1(4);
-f2a = p2(1)*Vector.^3 + p2(2)*Vector.^2 + p2(3)*Vector + p2(4);
-CortesInd = find(abs(f1a-f2a)<=(0.05));
+CortesInd = find(abs(Uplot-Pplot)<=(0.05));
 if ~isnan(CortesInd)
     DistCorte = Vector(CortesInd(1));
-    text(DistCorte,f1a(CortesInd(1)),...
+    text(DistCorte,Uplot(CortesInd(1)),...
         strcat('\bf\color{black}',[num2str(DistCorte),' m']),...
         'VerticalAlignment','bottom','HorizontalAlignment','left')
 end
 % Obtener numero de ceros decimales de las pendientes, sumarle 1 y convertir a
 % string, para mostrar tantos numeros decimales en las funciones que se ven en
 % la leyenda
-P11 = num2str(fix(abs(log10(abs(p1(1)))))+1);
-P12 = num2str(fix(abs(log10(abs(p1(2)))))+1);
-P13 = num2str(fix(abs(log10(abs(p1(3)))))+1);
-P21 = num2str(fix(abs(log10(abs(p2(1)))))+1);
-P22 = num2str(fix(abs(log10(abs(p2(2)))))+1);
-P23 = num2str(fix(abs(log10(abs(p2(3)))))+1);
-leyenda{1} = sprintf(['\\bf0 %s %d ms\\rm   R^2 = %4.2f\n\\color{blue}y = %4.',P11,'f·x^3+%4.',P12,'f·x^2+%4.',P13,'f·x+%4.2f'],handles.LWORDTO,Rango,rsq_adj1,p1(1),p1(2),p1(3),p1(4));
-leyenda{2} = sprintf(['\\bf%d ms %s\\rm   R^2 = %4.2f\n\\color{red}y = %4.',P21,'f·x^3+%4.',P22,'f·x^2+%4.',P23,'f·x+%4.2f'],Rango,handles.LTOINF,rsq_adj2,p2(1),p2(2),p2(3),p2(4));
+P11 = num2str(fix(abs(log10(abs(Ucoef.b))))+2);
+P21 = num2str(fix(abs(log10(abs(Pcoef.p1))))+2);
+
+leyenda{1} = sprintf(['\\bf0 %s %d ms\\rm   R^2_{adj} = %4.2f\n\\color{blue}y = %4.2f·x^{%4.',P11,'f} \n \\color{white}.'],handles.LWORDTO,Rango,Ures.adjrsquare,Ucoef.a,Ucoef.b);
+leyenda{2} = sprintf(['\\bf%d ms %s\\rm   R^2_{adj} = %4.2f\n\\color{red}y = %4.',P21,'f·x+%4.2f \n \\color{white}.'],Rango,handles.LTOINF,Pres.adjrsquare,Pcoef.p1,Pcoef.p2);
 lgdw=legend(Curv,leyenda);
 % Si se utiliza Matlab 2014b o anterior no añade el titulo a la leyenda ya
 % que no es compatible
