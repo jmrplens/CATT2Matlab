@@ -86,7 +86,7 @@ Mix1 = sortrows([Distancia',SPL0toValM']);
 % Si tiene distancias duplicadas se promedia el nivel de las dos distancias
 % iguales y elimina el duplicado
 [C,~,idx] = unique(Mix1(:,1),'stable');
-val = accumarray(idx,Mix1(:,2),[],@mean);
+val = accumarray(idx,Mix1(:,2),[],@(x) 10*log10(mean(10.^(x/10))));
 Mix1 = [C,val];
 % Añadir por extrapolacion valor en la posicion de 0 metros hasta la posicion del
 % receptor mas cercano
@@ -111,7 +111,7 @@ Mix2 = sortrows([Distancia',SPLValtoInfM']);
 % Si tiene distancias duplicadas se promedia el nivel de las dos distancias y
 % elimina el duplicado
 [C,~,idx] = unique(Mix2(:,1),'stable');
-val = accumarray(idx,Mix2(:,2),[],@mean);
+val = accumarray(idx,Mix2(:,2),[],@(x) 10*log10(mean(10.^(x/10))));
 Mix2 = [C,val];
 % Añadir por extrapolacion valor en la posicion de 0 metros hasta la posicion del
 % receptor mas cercano
