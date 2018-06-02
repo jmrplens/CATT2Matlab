@@ -43,12 +43,10 @@ if Tipo==1
                 % Suma el bloque por octavas
                 ValMS(j,:) = 10*log10(sum(10.^(Valores/10),1));
             else
-                ValMS(j,:)=0;
+                ValMS(j,:)=NaN;
             end
             
         end
-        % Todos los valores 0 y menores a 0 se dejan vacios
-        ValMS(ValMS<=0) = NaN;
         % Si se utiliza matlab 2014b o anterior realiza la interpolacion
         % manualmente, sino utiliza la funcion fillmising
         if verLessThan('matlab','8.7')
